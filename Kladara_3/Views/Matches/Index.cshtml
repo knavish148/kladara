@@ -1,7 +1,73 @@
-﻿@{
-    ViewData["Title"] = "Index";
+﻿@model IEnumerable<Kladara_3.Models.Match>
+
+@{
+    ViewData["Title"] = "Kladara";
 }
 
-<h2>Index</h2>
+<h2>All matches</h2>
 
-<p>Hello from our Matches View Template!</p>
+<p>These are all the matches you can bet on. Place your bet by selecting 1/x/2 in each row.</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Sport)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HomeTeam)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AwayTeam)
+            </th>
+            <th>
+                1
+            </th>
+            <th>
+                x
+            </th>
+            <th>
+                2
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Sport)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HomeTeam)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AwayTeam)
+                </td>
+                <td>
+                    <button class="button" id="@Html.DisplayFor(modelItem => item.Id)_1" background-color: #ffffff onclick="btnClick(id);">
+                        @Html.DisplayFor(modelItem => item.HomeWins)
+                    </button>
+                </td>
+                <td>
+                    <button class="button" id="@Html.DisplayFor(modelItem => item.Id)_X" background-color: #ffffff onclick="btnClick(id);">
+                        @Html.DisplayFor(modelItem => item.Tied)
+                    </button>
+                </td>
+                <td>
+                    <button class="button" id="@Html.DisplayFor(modelItem => item.Id)_2" background-color: #ffffff onclick="btnClick(id);">
+                        @Html.DisplayFor(modelItem => item.AwayWins)
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Ticket</h2>
+
+Wager:          <input class="input" type="text" name="FirstName" placeholder="amount(kn)" id="wager"><br>
+In Your wallet: 0<br>
+Possible gain:  0<br>
+<button onclick="ticketSubmit()">Submit</button>

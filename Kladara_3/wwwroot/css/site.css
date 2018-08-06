@@ -21,6 +21,11 @@
     width: 100%;
 }
 
+.button {
+    background-color: #ffffff; /* White */
+    width:50px;
+}
+
 /* QR code generator */
 #qrCode {
     margin: 15px;

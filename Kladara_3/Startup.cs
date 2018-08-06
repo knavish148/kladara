@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using Kladara_3.Models;
 
 namespace Kladara_3
 {
@@ -22,6 +24,9 @@ namespace Kladara_3
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.AddDbContext<Kladara_3Context>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("Kladara_3Context")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
