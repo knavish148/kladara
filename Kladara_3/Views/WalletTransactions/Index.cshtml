@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Kladara_3.Models.WalletTransaction>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Wallet Transactions</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.WalletBefore)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.WalletAfter)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TransactionDate)
+                </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.WalletBefore)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WalletAfter)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TransactionDate)
+            </td>
+            <td>
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

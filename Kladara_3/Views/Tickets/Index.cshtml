@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Kladara_3.Models.Ticket>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Tickets you submitted</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Wager)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PossibleGain)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Pairs)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Wager)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PossibleGain)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Pairs)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

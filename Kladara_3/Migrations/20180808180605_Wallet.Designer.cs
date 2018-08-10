@@ -11,8 +11,8 @@ using System;
 namespace Kladara_3.Migrations
 {
     [DbContext(typeof(Kladara_3Context))]
-    [Migration("20180804180906_Initial")]
-    partial class Initial
+    [Migration("20180808180605_Wallet")]
+    partial class Wallet
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -41,6 +41,52 @@ namespace Kladara_3.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Match");
+                });
+
+            modelBuilder.Entity("Kladara_3.Models.Pair", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Bet");
+
+                    b.Property<int>("MatchId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Pair");
+                });
+
+            modelBuilder.Entity("Kladara_3.Models.Ticket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Pairs");
+
+                    b.Property<int>("PossibleGain");
+
+                    b.Property<int>("Wager");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ticket");
+                });
+
+            modelBuilder.Entity("Kladara_3.Models.WalletTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("TransactionDate");
+
+                    b.Property<double>("WalletAfter");
+
+                    b.Property<double>("WalletBefore");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WalletTransaction");
                 });
 #pragma warning restore 612, 618
         }

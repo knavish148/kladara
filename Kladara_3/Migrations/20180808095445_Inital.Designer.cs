@@ -11,9 +11,10 @@ using System;
 namespace Kladara_3.Migrations
 {
     [DbContext(typeof(Kladara_3Context))]
-    partial class Kladara_3ContextModelSnapshot : ModelSnapshot
+    [Migration("20180808095445_Inital")]
+    partial class Inital
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,22 +71,6 @@ namespace Kladara_3.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Ticket");
-                });
-
-            modelBuilder.Entity("Kladara_3.Models.WalletTransaction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("TransactionDate");
-
-                    b.Property<double>("WalletAfter");
-
-                    b.Property<double>("WalletBefore");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("WalletTransaction");
                 });
 #pragma warning restore 612, 618
         }

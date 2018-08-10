@@ -1,0 +1,100 @@
+﻿@model Kladara_3.Models.TicketDetailsViewModel
+@using Kladara_3.Controllers
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Ticket details</h2>
+
+<div>
+    <h4>Ticket</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Wager)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Wager)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PossibleGain)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PossibleGain)
+        </dd>
+    </dl>
+
+    <h5>Pairs</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Sport
+                </th>
+                <th>
+                    Home Team
+                </th>
+                <th>
+                    Away Team
+                </th>
+                <th>
+                    1
+                </th>
+                <th>
+                    X
+                </th>
+                <th>
+                    2
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.PairDetails)
+            {
+                var HomeWinsText = "";
+                var TiedText = "";
+                var AwayWinsText = "";
+
+                switch (item.Pair.Bet)
+                {
+                    case BetType.BetHome:
+                        HomeWinsText = "\u2714";
+                        break;
+                    case BetType.BetTied:
+                        TiedText = "\u2714";
+                        break;
+                    case BetType.BetAway:
+                        AwayWinsText = "\u2714";
+                        break;
+                }
+
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Match.Sport)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Match.HomeTeam)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Match.AwayTeam)
+                    </td>
+                    <td>
+                        @HomeWinsText
+                    </td>
+                    <td>
+                        @TiedText
+                    </td>
+                    <td>
+                        @AwayWinsText
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
