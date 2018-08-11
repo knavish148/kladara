@@ -1,5 +1,4 @@
-﻿@model Kladara_3.Models.TicketDetailsViewModel
-@using Kladara_3.Controllers
+﻿@model TicketDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -53,21 +52,23 @@
         <tbody>
             @foreach (var item in Model.PairDetails)
             {
-                var HomeWinsText = "";
-                var TiedText = "";
-                var AwayWinsText = "";
+                var homeWinsText = "";
+                var tiedText = "";
+                var awayWinsText = "";
 
                 switch (item.Pair.Bet)
                 {
                     case BetType.BetHome:
-                        HomeWinsText = "\u2714";
+                        homeWinsText = "\u2714";
                         break;
                     case BetType.BetTied:
-                        TiedText = "\u2714";
+                        tiedText = "\u2714";
                         break;
                     case BetType.BetAway:
-                        AwayWinsText = "\u2714";
+                        awayWinsText = "\u2714";
                         break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
 
                 <tr>
@@ -81,13 +82,13 @@
                         @Html.DisplayFor(modelItem => item.Match.AwayTeam)
                     </td>
                     <td>
-                        @HomeWinsText
+                        @homeWinsText
                     </td>
                     <td>
-                        @TiedText
+                        @tiedText
                     </td>
                     <td>
-                        @AwayWinsText
+                        @awayWinsText
                     </td>
                 </tr>
             }

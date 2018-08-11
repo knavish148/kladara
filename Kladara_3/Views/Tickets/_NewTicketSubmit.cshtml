@@ -1,9 +1,14 @@
-﻿@model Kladara_3.Models.NewTicketData
+﻿@model NewTicketData
 
 <h2>New Ticket</h2>
 
-    Wager: <input class="input" type="number" name="FirstName" id="wager" value=@Html.DisplayFor(modelItem => Model.Wager) onchange="wagerInputChange()"><br>
+<div class="divSubmit">
+    Wager: <input type="number" name="FirstName" id="wager"
+                  value="@Html.DisplayFor(modelItem => Model.Wager)"
+                  onchange="wagerInputChange()"><br>
     In Your wallet: <p style="display:inline" id="wallet">@Html.DisplayFor(modelItem => Model.Wallet)</p><br>
     Possible gain:  <p style="display:inline" id="possibleGain">@Html.DisplayFor(modelItem => Model.PossibleGain)</p><br>
-    Bonus:  <p style="display:inline" id="possibleGain">@Html.DisplayFor(modelItem => Model.Bonus)</p><br>
-    <button id="ticketSubmitBtn" onclick="submitBtnClk()">Submit</button>
+    Bonus:  <p style="display:inline" id="bonus">@Html.DisplayFor(modelItem => Model.Bonus)</p><br>
+    <button id="ticketSubmitBtn" class="buttonSubmit" 
+            onclick="submitBtnClk()">Submit</button>
+</div>

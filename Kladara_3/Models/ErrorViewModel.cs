@@ -1,6 +1,4 @@
-using System;
-
-namespace Kladara_3.Models
+namespace Kladara3.Models
 {
     public class ErrorViewModel
     {

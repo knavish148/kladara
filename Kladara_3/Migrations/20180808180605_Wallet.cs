@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
 
-namespace Kladara_3.Migrations
+namespace Kladara3.Migrations
 {
     public partial class Wallet : Migration
     {

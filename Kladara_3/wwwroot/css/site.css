@@ -22,8 +22,20 @@
 }
 
 .button {
-    background-color: #ffffff; /* White */
+    background-color: white;
     width:50px;
+}
+
+.buttonSubmit {
+    float: right;
+     
+}
+
+.divSubmit {
+    padding: 10px;
+    border: 1px solid gray;
+    width: 250px;
+    height: 135px;
 }
 
 /* QR code generator */

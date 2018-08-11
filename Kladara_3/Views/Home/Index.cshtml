@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Kladara_3.Models.Match>
+﻿@model MatchesNewTicketViewModel
 
 @{
     ViewData["Title"] = "Kladara";
@@ -12,13 +12,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Sport)
+                Sport
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.HomeTeam)
+                Home Team
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AwayTeam)
+                Away Team
             </th>
             <th>
                 1
@@ -33,7 +33,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Matches)
         {
             <tr>
                 <td>
@@ -65,6 +65,8 @@
     </tbody>
 </table>
 
+<div id="newTicket">
 @{
-    await Html.RenderPartialAsync("~/Views/Tickets/_NewTicket.cshtml");
+    await Html.RenderPartialAsync("~/Views/Tickets/_NewTicketSubmit.cshtml", Model.NewTicketData);
 }
+</div>

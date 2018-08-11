@@ -2,15 +2,16 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using Kladara3.Data;
 
-namespace Kladara_3.Models
+namespace Kladara3.Models
 {
     public static class SeedData
     {
         public static void Initialize(IServiceProvider serviceProvider)
         {
-            using (var context = new Kladara_3Context(
-                serviceProvider.GetRequiredService<DbContextOptions<Kladara_3Context>>()))
+            using (var context = new Kladara3Context(
+                serviceProvider.GetRequiredService<DbContextOptions<Kladara3Context>>()))
             {
                 SeedMatches(context);
                 SeedPairs(context);
@@ -20,7 +21,7 @@ namespace Kladara_3.Models
             }
         }
 
-        private static void SeedMatches(Kladara_3Context context)
+        private static void SeedMatches(Kladara3Context context)
         {
             // Look for any matches in DB
             if (context.Match.Any())
@@ -91,7 +92,7 @@ namespace Kladara_3.Models
             );
         }
 
-        private static void SeedPairs(Kladara_3Context context)
+        private static void SeedPairs(Kladara3Context context)
         {
             // Look for any pairs in DB
             if (context.Pair.Any())
@@ -122,7 +123,7 @@ namespace Kladara_3.Models
 
         }
 
-        private static void SeedWallet(Kladara_3Context context)
+        private static void SeedWallet(Kladara3Context context)
         {
             // Look for any wallet data in DB
             if (context.WalletTransaction.Any())

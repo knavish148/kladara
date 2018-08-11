@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace Kladara_3.Models
+namespace Kladara3.Models
 {
     public enum BetType
     {
@@ -22,7 +21,7 @@ namespace Kladara_3.Models
         // string that consists of Pair Id's separated by commas
         public static string StringifyPairs(List<Pair> pairs)
         {
-            string result = "";
+            var result = "";
 
             foreach (var pair in pairs)
             {
@@ -39,12 +38,17 @@ namespace Kladara_3.Models
 
         public static BetType GetBetType(string betStr)
         {
-            if (betStr == "1")
-                return BetType.BetHome;
-            else if (betStr == "X")
-                return BetType.BetTied;
-            else
-                return BetType.BetAway;
+            switch (betStr)
+            {
+                case "1":
+                    return BetType.BetHome;
+                case "X":
+                    return BetType.BetTied;
+                case "2":
+                    return BetType.BetAway;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Kladara3.Data;
+using Kladara3.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Kladara_3.Models;
 
-namespace Kladara_3.Controllers
+namespace Kladara3.Controllers
 {
     public class TicketsController : Controller
     {
-        private readonly Kladara_3Context _context;
-        private static List<Pair> userPairs = new List<Pair>();
+        private readonly Kladara3Context _context;
+        private static List<Pair> _userPairs = new List<Pair>();
 
         // ctor
-        public TicketsController(Kladara_3Context context)
+        public TicketsController(Kladara3Context context)
         {
             _context = context;
         }
@@ -33,7 +33,7 @@ namespace Kladara_3.Controllers
                 PossibleGain = 0.00,
                 Bonus = 0
             };
-            userPairs = new List<Pair>();
+            _userPairs = new List<Pair>();
             return View(await _context.Ticket.ToListAsync());
         }
 
@@ -52,25 +52,21 @@ namespace Kladara_3.Controllers
                 return NotFound();
             }
 
-            TicketDetailsViewModel ticketMatches = new TicketDetailsViewModel
+            var ticketMatches = new TicketDetailsViewModel
             {
                 Wager = ticket.Wager,
                 PossibleGain = ticket.PossibleGain
             };
 
-            List<PairDetails> pairDetails = new List<PairDetails>();
-            List<int> pairIds = new List<int>();
-            foreach (var pairId in ticket.Pairs.Split(','))
-                pairIds.Add(Int32.Parse(pairId));
+            var pairDetails = new List<PairDetails>();
+            var pairIds = ticket.Pairs.Split(',').Select(int.Parse).ToList();
 
             foreach (var pairId in pairIds)
             {
-                Pair pair = _context.Pair
+                var pair = _context.Pair
                 .SingleOrDefault(m => m.Id == pairId);
 
-                List<Match> matches = _context.Match.ToList();
-
-                Match match = _context.Match.SingleOrDefault(m => m.Id == pair.MatchId);
+                var match = _context.Match.SingleOrDefault(m => m.Id == pair.MatchId);
 
                 pairDetails.Add(new PairDetails
                 {
@@ -116,45 +112,45 @@ namespace Kladara_3.Controllers
         // POST: Tickets/UpdatePairs/<match_id>_1
         // POST: Tickets/UpdatePairs/<match_id>_X
         // POST: Tickets/UpdatePairs/<match_id>_2
-        public string UpdatePairs(string matchId_bet)
+        public string UpdatePairs(string matchIdBet)
         {
             // Update list of unsubmitted tickets
-            if (matchId_bet == null)
+            if (matchIdBet == null)
             {
                 UpdateNewTicketData();
                 return "fail";
             }
 
-            string[] data = matchId_bet.Split('_');
+            var data = matchIdBet.Split('_');
             // parse match id
-            if (!Int32.TryParse(data[0], out int matchId))
+            if (!int.TryParse(data[0], out var matchId))
             {
                 UpdateNewTicketData();
                 return "fail";
             }
 
 
-            Pair p = userPairs.Find(f => f.MatchId == matchId);
+            var p = _userPairs.Find(f => f.MatchId == matchId);
 
             // User deselects the pair he selected previously
             if (p != null && p.Bet == Pair.GetBetType(data[1]))
             {
-                userPairs.Remove(p);
+                _userPairs.Remove(p);
             }
             // User bets on same match but changes the bet (1/X/2)
             else if (p != null)
             {
-                userPairs.Remove(p);
+                _userPairs.Remove(p);
                 // Create new Pair instance and add it to the list   
-                Pair pNew = _context.Pair.SingleOrDefault(f => f.MatchId == matchId && f.Bet == Pair.GetBetType(data[1]));
-                userPairs.Add(pNew);
+                var pNew = _context.Pair.SingleOrDefault(f => f.MatchId == matchId && f.Bet == Pair.GetBetType(data[1]));
+                _userPairs.Add(pNew);
             }
             // User bets on a new match
             else
             {
                 // Obtain Pair instance from DB and add it to the list of user selected pairs 
-                Pair pNew = _context.Pair.SingleOrDefault(f => f.MatchId == matchId && f.Bet == Pair.GetBetType(data[1]));
-                userPairs.Add(pNew);
+                var pNew = _context.Pair.SingleOrDefault(f => f.MatchId == matchId && f.Bet == Pair.GetBetType(data[1]));
+                _userPairs.Add(pNew);
             }
 
             // Inform client of successful post action
@@ -174,22 +170,22 @@ namespace Kladara_3.Controllers
         public string Submit()
         {
 
-            Ticket ticket = new Ticket
+            var ticket = new Ticket
             {
                 Wager = NewTicketData.Wager,
                 PossibleGain = (int)NewTicketData.PossibleGain,
-                Pairs = Pair.StringifyPairs(userPairs)
+                Pairs = Pair.StringifyPairs(_userPairs)
             };
 
             _context.Add(ticket);
             _context.SaveChanges();
 
             UpdateWalletState();
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(500);
             ResetNewTicketData();
-            userPairs = new List<Pair>();
+            _userPairs = new List<Pair>();
 
-            return "Matches";
+            return "Home";
         }
 
         // GET Tickets/RefreshNewTicketData
@@ -214,26 +210,25 @@ namespace Kladara_3.Controllers
 
         public async void UpdateWalletState()
         {
-            double walletState = WalletTransactionsController.GetWalletState(_context);
-            WalletTransaction transaction = new WalletTransaction
+            var walletState = WalletTransactionsController.GetWalletState(_context);
+            var transaction = new WalletTransaction
             {
                 WalletBefore = walletState,
                 WalletAfter = walletState - NewTicketData.Wager,
                 TransactionDate = DateTime.Now
             };
             await new WalletTransactionsController(_context).Create(transaction);
-            return;
         }
 
         // Calculate possible gain based on wager entered and selected pairs
         public double CalculatePossibleGain(int wager, int bonus)
         {
-            double gain = (double)wager;
+            var gain = (double)wager;
 
-            if (!userPairs.Any())
+            if (!_userPairs.Any())
                 return 0;
 
-            foreach (var pair in userPairs.ToList())
+            foreach (var pair in _userPairs.ToList())
             {
                 var match = _context.Match
                 .SingleOrDefault(m => m.Id == pair.MatchId);
@@ -245,15 +240,15 @@ namespace Kladara_3.Controllers
         }
 
         // Add bonuses on possible gain sum to user:
-        // - Add 5 if user on three pairs from same sport
+        // - Add 5 if user bet on three pairs from same sport
         // - Add 10 if user bet on at least one pair from all sports
         public int CalculateBonus()
         {
-            List<Match> userMatches = new List<Match>();
-            List<Match> allMatches = _context.Match.ToList();
-            int bonus = 0;
+            var userMatches = new List<Match>();
+            var allMatches = _context.Match.ToList();
+            var bonus = 0;
 
-            foreach (var pair in userPairs.ToList())
+            foreach (var pair in _userPairs.ToList())
             {
                 var match = _context.Match
                 .SingleOrDefault(m => m.Id == pair.MatchId);
@@ -265,7 +260,7 @@ namespace Kladara_3.Controllers
                                   group m by m.Sport into g
                                   let count = g.Count()
                                   orderby count descending
-                                  select count).First();
+                                  select count).FirstOrDefault();
 
             if (countSameSport >= 3) 
                 bonus += 5;

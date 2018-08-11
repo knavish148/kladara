@@ -7,12 +7,12 @@
 
 function btnClick(btnId) {
     var btn = document.getElementById(btnId);
-    var btnClr = getStyle(btn, 'backgroundColor');
+    var btnClr = getStyle(btn, "backgroundColor");
 
     // Button could be previously selected
     if (btnClr === "rgb(255, 255, 255)") {
         // Deselect all buttons in a row
-        var n = btnId.indexOf('_');
+        var n = btnId.indexOf("_");
         var reg = "button[id^=" + btnId.substr(0, n) + "]";
         $(reg).each(function (i, obj) {
             obj.style.backgroundColor = "#ffffff";
@@ -26,7 +26,7 @@ function btnClick(btnId) {
 
     //Notify server about selected pair and the bet by passing 
     // - Match Id and Bet type (1/X/2)
-    $.post('tickets/updatepairs?matchId_bet=' + btnId,
+    $.post("tickets/updatepairs?matchIdBet=" + btnId,
         function (serverResponse) {
             if (serverResponse === "success") {
                 console.log("Successfully posted new Pair to server: " + btnId);
@@ -48,14 +48,14 @@ function getStyle(el, styleProp) {
 
 // HTTP GET: Update new ticket info client-side
 function RefreshNetTicketData() {
-    $.get('tickets/RefreshNewTicketDataView', {},
+    $.get("tickets/RefreshNewTicketDataView", {},
         function (data) {
             console.log("Server response: Successfully obtained newTicketData");
             $("#newTicket").html(data);
         }, "html");
 }
 
-function wagerInputChange(e) {
+function wagerInputChange() {
     $.post("Tickets/WagerUpdate?value=" + $("#wager").val(),
         function (response) {
             if (response === "success") {
@@ -67,9 +67,16 @@ function wagerInputChange(e) {
 
 // Handle ticket submit
 function submitBtnClk() {
-    $.post('tickets/submit', {},
-        function (result) {
-            console.log("Server response: Successfully submitted new ticket");
-            window.location = result;
-        });
+    wager = $("#wager").val();
+    if (parseInt(wager) && wager >= 0) {
+        $.post("tickets/submit", {},
+            function (result) {
+                console.log("Server response: Successfully submitted new ticket");
+                window.location = result;
+            });
+    } else {
+        alert("Wager must be non-zero.");
+    }
+
+    
 }

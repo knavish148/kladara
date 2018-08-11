@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Kladara3.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Kladara_3.Models;
 
-namespace Kladara_3
+namespace Kladara3
 {
     public class Startup
     {
@@ -25,7 +21,7 @@ namespace Kladara_3
         {
             services.AddMvc();
 
-            services.AddDbContext<Kladara_3Context>(options =>
+            services.AddDbContext<Kladara3Context>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("Kladara_3Context")));
         }
 
@@ -48,7 +44,7 @@ namespace Kladara_3
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Matches}/{action=Index}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

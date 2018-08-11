@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using Kladara3.Data;
+using Kladara3.Models;
 using Microsoft.EntityFrameworkCore;
-using Kladara_3.Models;
-using Kladara_3;
 
-namespace Kladara_3
+namespace Kladara3
 {
     public class Program
     {
@@ -21,7 +21,7 @@ namespace Kladara_3
 
                 try
                 {
-                    var context = services.GetRequiredService<Kladara_3Context>();
+                    var context = services.GetRequiredService<Kladara3Context>();
                     context.Database.Migrate();
                     SeedData.Initialize(services);
                 }
