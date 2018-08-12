@@ -12,9 +12,10 @@ using System;
 namespace Kladara3.Migrations
 {
     [DbContext(typeof(Kladara3Context))]
-    partial class Kladara_3ContextModelSnapshot : ModelSnapshot
+    [Migration("20180811232859_Ticket")]
+    partial class Ticket
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

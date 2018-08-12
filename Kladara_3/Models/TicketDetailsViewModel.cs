@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Kladara3.Models
 {
@@ -6,7 +7,9 @@ namespace Kladara3.Models
     {
         public int Id { get; set; }
         public int Wager { get; set; }
-        public int PossibleGain { get; set; }
+        public int Bonus { get; set; }
+        public double PossibleGain { get; set; }
+        public DateTime Date { get; set; }
         public List<PairDetails> PairDetails { get; set; }
     }
 

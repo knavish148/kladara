@@ -8,7 +8,8 @@ namespace Kladara3.Models
     {
         BetHome,
         BetTied,
-        BetAway
+        BetAway,
+        BetWrong
     };
 
     public class Pair

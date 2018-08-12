@@ -20,24 +20,25 @@ namespace Kladara3.Controllers
             _context = context;
         }
 
+        internal static void InitData(NewTicketData newTicketData)
+        {
+            NewTicketData = newTicketData;
+            _userPairs = new List<Pair>();
+        }
+
         // static field getter/setter
         public static NewTicketData NewTicketData { get; set; }
+
+
+        // --------------- HTTP REQUEST HANDLERS ---------------
 
         // GET: Tickets
         public async Task<IActionResult> Index()
         {
-            NewTicketData = new NewTicketData
-            {
-                Wager = 0,
-                Wallet = WalletTransactionsController.GetWalletState(_context),
-                PossibleGain = 0.00,
-                Bonus = 0
-            };
-            _userPairs = new List<Pair>();
             return View(await _context.Ticket.ToListAsync());
         }
 
-        // GET: Tickets/Details/5
+        // GET: Tickets/Details/<ticket_id>
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -52,12 +53,6 @@ namespace Kladara3.Controllers
                 return NotFound();
             }
 
-            var ticketMatches = new TicketDetailsViewModel
-            {
-                Wager = ticket.Wager,
-                PossibleGain = ticket.PossibleGain
-            };
-
             var pairDetails = new List<PairDetails>();
             var pairIds = ticket.Pairs.Split(',').Select(int.Parse).ToList();
 
@@ -65,17 +60,33 @@ namespace Kladara3.Controllers
             {
                 var pair = _context.Pair
                 .SingleOrDefault(m => m.Id == pairId);
+                if (pair == null)
+                {
+                    return NotFound();
+                }
 
                 var match = _context.Match.SingleOrDefault(m => m.Id == pair.MatchId);
-
-                pairDetails.Add(new PairDetails
+                if (match == null)
                 {
-                    Pair = pair,
-                    Match = match
-                });
+                    return NotFound();
+                }
+
+                pairDetails.Add(
+                    new PairDetails
+                    {
+                        Pair = pair,
+                        Match = match
+                    });
             }
 
-            ticketMatches.PairDetails = pairDetails;
+            var ticketMatches = new TicketDetailsViewModel
+            {
+                Wager = ticket.Wager,
+                Bonus = ticket.Bonus,
+                PossibleGain = ticket.PossibleGain,
+                Date = ticket.Date,
+                PairDetails = pairDetails
+            };
 
             return View(ticketMatches);
         }
@@ -112,69 +123,74 @@ namespace Kladara3.Controllers
         // POST: Tickets/UpdatePairs/<match_id>_1
         // POST: Tickets/UpdatePairs/<match_id>_X
         // POST: Tickets/UpdatePairs/<match_id>_2
-        public string UpdatePairs(string matchIdBet)
+        public IActionResult UpdatePairs(string matchIdBet)
         {
-            // Update list of unsubmitted tickets
+            // Parse function parameters
             if (matchIdBet == null)
             {
-                UpdateNewTicketData();
-                return "fail";
+                return new BadRequestResult();
             }
 
             var data = matchIdBet.Split('_');
-            // parse match id
-            if (!int.TryParse(data[0], out var matchId))
+            if (data.Length != 2)
+                return new BadRequestResult();
+
+            var bet = Pair.GetBetType(data[1]);
+            if (!int.TryParse(data[0], out var matchId) ||
+                bet == BetType.BetWrong)
+                return new BadRequestResult();
+
+
+            var pair = _userPairs.Find(f => f.MatchId == matchId);
+
+            // User deselects the pair he/she selected previously
+            if (pair != null && pair.Bet == Pair.GetBetType(data[1]))
             {
-                UpdateNewTicketData();
-                return "fail";
+                _userPairs.Remove(pair);
             }
-
-
-            var p = _userPairs.Find(f => f.MatchId == matchId);
-
-            // User deselects the pair he selected previously
-            if (p != null && p.Bet == Pair.GetBetType(data[1]))
+            // User bets on same match but changes the bet type (1/X/2)
+            else if (pair != null)
             {
-                _userPairs.Remove(p);
-            }
-            // User bets on same match but changes the bet (1/X/2)
-            else if (p != null)
-            {
-                _userPairs.Remove(p);
-                // Create new Pair instance and add it to the list   
-                var pNew = _context.Pair.SingleOrDefault(f => f.MatchId == matchId && f.Bet == Pair.GetBetType(data[1]));
-                _userPairs.Add(pNew);
+                _userPairs.Remove(pair);
+                // Obtain Pair instance from DB and add it to the list of user selected pairs
+                var newPair = _context.Pair.SingleOrDefault(f => f.MatchId == matchId && f.Bet == bet);
+                if (newPair == null)
+                    return NotFound();
+                _userPairs.Add(newPair);
             }
             // User bets on a new match
             else
             {
                 // Obtain Pair instance from DB and add it to the list of user selected pairs 
-                var pNew = _context.Pair.SingleOrDefault(f => f.MatchId == matchId && f.Bet == Pair.GetBetType(data[1]));
-                _userPairs.Add(pNew);
+                var newPair = _context.Pair.SingleOrDefault(f => f.MatchId == matchId && f.Bet == bet);
+                if (newPair == null)
+                    return NotFound();
+                _userPairs.Add(newPair);
             }
 
-            // Inform client of successful post action
             UpdateNewTicketData();
-            return "success";
+
+            return Ok();
         }
 
         // POST: Tickets/WagerUpdate/<new_wager_value>
-        public string WagerUpdate(int value)
+        public IActionResult WagerUpdate(int value)
         {
             NewTicketData.Wager = value;
             UpdateNewTicketData();
-            return "success";
+            return Ok();
         }
 
         // POST: Tickets/Submit
-        public string Submit()
+        public IActionResult Submit()
         {
-
             var ticket = new Ticket
             {
                 Wager = NewTicketData.Wager,
-                PossibleGain = (int)NewTicketData.PossibleGain,
-                Pairs = Pair.StringifyPairs(_userPairs)
+                Bonus = NewTicketData.Bonus,
+                PossibleGain = NewTicketData.PossibleGain,
+                Pairs = Pair.StringifyPairs(_userPairs),
+                Date = DateTime.Now
             };
 
             _context.Add(ticket);
@@ -182,10 +198,12 @@ namespace Kladara3.Controllers
 
             UpdateWalletState();
             System.Threading.Thread.Sleep(500);
+
+            // Reset controller data
             ResetNewTicketData();
             _userPairs = new List<Pair>();
 
-            return "Home";
+            return Ok("Home");
         }
 
         // GET Tickets/RefreshNewTicketData
@@ -202,10 +220,9 @@ namespace Kladara3.Controllers
         {
             if (t == BetType.BetHome)
                 return match.HomeWins;
-            else if (t == BetType.BetTied)
+            if (t == BetType.BetTied)
                 return match.Tied;
-            else
-                return match.AwayWins;
+            return match.AwayWins;
         }
 
         public async void UpdateWalletState()
@@ -225,18 +242,20 @@ namespace Kladara3.Controllers
         {
             var gain = (double)wager;
 
-            if (!_userPairs.Any())
+            if (!_userPairs.Any() || wager == 0)
                 return 0;
 
             foreach (var pair in _userPairs.ToList())
             {
                 var match = _context.Match
                 .SingleOrDefault(m => m.Id == pair.MatchId);
+                if (match == null)
+                    throw new Exception("Match not present in _context");
 
                 gain *= GetBetAmount(match, pair.Bet);
             }
 
-            return gain + bonus;
+            return Math.Round(gain, 2) + bonus;
         }
 
         // Add bonuses on possible gain sum to user:
@@ -252,6 +271,8 @@ namespace Kladara3.Controllers
             {
                 var match = _context.Match
                 .SingleOrDefault(m => m.Id == pair.MatchId);
+                if (match == null)
+                    throw new Exception("Match not present in _context");
 
                 userMatches.Add(match);
             }

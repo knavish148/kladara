@@ -13,10 +13,16 @@
                 @Html.DisplayNameFor(model => model.Wager)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.Bonus)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.PossibleGain)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Pairs)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
             </th>
         </tr>
     </thead>
@@ -27,10 +33,16 @@
                 @Html.DisplayFor(modelItem => item.Wager)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.Bonus)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.PossibleGain)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Pairs)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
             </td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

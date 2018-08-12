@@ -1,10 +1,5 @@
 ﻿// Write your JavaScript code.
 
-//$(document).ready(function () {
-//    // Send an GET request to obtain wallet state
-//    getWalletState();
-//});
-
 function btnClick(btnId) {
     var btn = document.getElementById(btnId);
     var btnClr = getStyle(btn, "backgroundColor");
@@ -27,13 +22,9 @@ function btnClick(btnId) {
     //Notify server about selected pair and the bet by passing 
     // - Match Id and Bet type (1/X/2)
     $.post("tickets/updatepairs?matchIdBet=" + btnId,
-        function (serverResponse) {
-            if (serverResponse === "success") {
-                console.log("Successfully posted new Pair to server: " + btnId);
-                RefreshNetTicketData();
-            } else {
-                console.log("New Pair post to server failed: " + btnId);
-            }
+        function () {
+            console.log("Successfully posted new Pair to server: " + btnId);
+            RefreshNetTicketData();
         }
     );
 }
@@ -57,17 +48,15 @@ function RefreshNetTicketData() {
 
 function wagerInputChange() {
     $.post("Tickets/WagerUpdate?value=" + $("#wager").val(),
-        function (response) {
-            if (response === "success") {
-                console.log("Server response: wager change success");
-                RefreshNetTicketData();
-            }
+        function () {
+            console.log("Server response: wager change success");
+            RefreshNetTicketData();
         });
 }
 
 // Handle ticket submit
 function submitBtnClk() {
-    wager = $("#wager").val();
+    var wager = $("#wager").val();
     if (parseInt(wager) && wager >= 0) {
         $.post("tickets/submit", {},
             function (result) {
@@ -78,5 +67,5 @@ function submitBtnClk() {
         alert("Wager must be non-zero.");
     }
 
-    
+
 }
